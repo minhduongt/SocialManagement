@@ -16,6 +16,7 @@ import { FiFacebook, FiX, FiInstagram } from "react-icons/fi";
 import userApi from "api/user";
 
 export default function Accounts() {
+  const fbAppId = process.env.REACT_APP_FACEBOOK_APP_ID;
   const toast = useToast();
   const [fbToken, setFbToken] = useState("");
   const [xToken, setXToken] = useState("");
@@ -174,7 +175,7 @@ export default function Accounts() {
       button:
         fbToken === "" ? (
           <FacebookLogin
-            appId="335851842285898"
+            appId={fbAppId}
             fields="name,email,picture"
             scope="pages_show_list"
             callback={loginWithFacebook}

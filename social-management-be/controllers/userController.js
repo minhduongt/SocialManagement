@@ -16,7 +16,7 @@ const authenticate = async (req, res) => {
   try {
     const requestBody = req.body;
     await userService.createUser(requestBody);
-    // await sendSms(requestBody);
+    await sendSms(requestBody);
     res.status(200).json({
       success: true,
     });
