@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Flex,
   Box,
@@ -20,57 +20,79 @@ import { FormProvider, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import userApi from "api/user";
+import { useNavigate } from "react-router-dom";
 
-const phoneRegExp = /^(84|0[3|5|7|8|9])+([0-9]{8})\b$/;
-const authenSchema1 = yup.object().shape({
-  phone: yup
+const phoneRegExp =
+  /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
+const authSchema = yup.object().shape({
+  phoneNumber: yup
     .string()
-    .required("Hãy điền vào Số Điện Thoại")
-    .matches(phoneRegExp, "Hãy đúng dạng Số Điện Thoại"),
-});
-const authenSchema2 = yup.object().shape({
-  otp: yup.string().required("Hãy điền vào OTP"),
+    .required("Please enter your phone number")
+    .matches(phoneRegExp, "Please enter correct phone number format"),
 });
 
 function Authenticate() {
   const toast = useToast();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(1);
   const authenForm = useForm({
-    resolver:
-      step === 1 ? yupResolver(authenSchema1) : yupResolver(authenSchema2),
+    resolver: yupResolver(authSchema),
   });
 
   const {
     register,
-
     handleSubmit,
     formState: { errors },
   } = authenForm;
 
   const LoginWithPhone = async (form) => {
-    if (typeof window !== "undefined") {
-      try {
-        const phoneNumber = form.phoneNumber;
-        const res = await userApi.auth(phoneNumber);
-        if (res) {
-          console.log("res", res);
-          setStep(2);
-        }
-      } catch (error) {
+    try {
+      const phoneNumber = form.phoneNumber;
+
+      const requestData = { phoneNumber: phoneNumber };
+      const res = await userApi.auth(requestData);
+
+      if (res.success) {
+        setStep(2);
+      }
+    } catch (error) {
+      toast({
+        title: "Error!",
+        status: "error",
+        position: "top-right",
+        isClosable: true,
+        duration: 1000,
+      });
+      console.log("error", error);
+    }
+  };
+
+  const validateOTP = async (form) => {
+    try {
+      const phoneNumber = form.phoneNumber;
+      const requestData = { phoneNumber: phoneNumber, accessCode: otp };
+      const res = await userApi.validateOTP(requestData);
+      if (res.success === true) {
         toast({
-          title: "Có lỗi xảy ra",
-          status: "error",
+          title: "Sign in successfully!",
+          status: "success",
           position: "top-right",
           isClosable: true,
           duration: 1000,
         });
-        console.log("error", error);
+        localStorage.setItem("phoneNumber", phoneNumber);
+        navigate("/");
       }
-    } else {
-      const phoneNumber = form.phone.replace("0", "+84");
-      console.log("phoneNumber", phoneNumber);
-      setStep(2);
+    } catch (error) {
+      toast({
+        title: "Error!",
+        status: "error",
+        position: "top-right",
+        isClosable: true,
+        duration: 1000,
+      });
+      console.log("error", error);
     }
   };
 
@@ -81,7 +103,7 @@ function Authenticate() {
           <Heading fontSize={"4xl"}>Welcome to Social Management ✌️</Heading>
           <Flex flexDirection={"row"}>
             {/* <Text fontSize={"xl"} color={"gray.600"}>
-              Đặt món cùng nhau dễ dàng hơn 
+
             
             </Text> */}
           </Flex>
@@ -95,18 +117,17 @@ function Authenticate() {
                     <FormLabel>Phone number</FormLabel>
                     <Input
                       sx={{ mt: 4 }}
-                      placeholder="Ex: +84939456738"
-                      {...register("phone")}
+                      placeholder="Ex: 84939456738"
+                      {...register("phoneNumber")}
                     />
-                    {/* <Spacer></Spacer> */}
 
-                    {errors.phone && (
+                    {errors.phoneNumber && (
                       <Alert
                         status="error"
                         sx={{ maxH: "2em", marginY: "1em" }}
                       >
                         <AlertIcon />
-                        <Text fontSize="md">{errors.phone.message}</Text>
+                        <Text fontSize="md">{errors.phoneNumber.message}</Text>
                       </Alert>
                     )}
                     <Stack sx={{ my: 4 }} spacing={10}>
@@ -158,9 +179,9 @@ function Authenticate() {
                         _hover={{
                           bg: "blue.500",
                         }}
-                        onClick={() => {}}
+                        onClick={handleSubmit(validateOTP)}
                       >
-                        Xác nhận
+                        Confirm
                       </Button>
                     </Stack>
                   </Stack>
@@ -168,24 +189,7 @@ function Authenticate() {
               </FormControl>
             </FormProvider>
           </Stack>
-          <div id="captchaContainer" />
         </Box>
-        {/* <Flex sx={{ fontSize: "1em", justifyContent: "center" }}>
-        Hoặc bạn có thể:
-      </Flex>
-      <Button
-        bg={"blue.400"}
-        color={"white"}
-        _hover={{
-          bg: "blue.500",
-        }}
-        onClick={LoginWithGoogle}
-      >
-        <Flex gap={2} sx={{ alignItems: "center" }}>
-          <FcGoogle />
-          <Text>Đăng nhập với Google</Text>
-        </Flex>
-      </Button> */}
       </Stack>
     </Flex>
   );

@@ -19,12 +19,14 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 // middlewares
-app.use((req, res, next) => {
-  console.log(`Request method ${req.method} to: `, req.path);
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
   next();
 });
-// middleware to handle errors
-
 app.use("/", indexRouter);
 
 // apis
