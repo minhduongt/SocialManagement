@@ -25,12 +25,12 @@
 ```
 cd social-management
 npm install or yarn
-npm start
+npm start or yarn start
 ```
 
 ### Back-end
 ```
 cd social-management-be
 npm install or yarn
-npm start
+npm start or yarn start
 ```
