@@ -22,7 +22,8 @@
 ## **How to run**
 Clone the project.
 > _Require install Node version >= 14_
-> _!! Need configuration file to start both project correctly_
+
+> _!! Need configuration file to start both project correctly (Contact me)_
 
 ### Front-end
 ```
