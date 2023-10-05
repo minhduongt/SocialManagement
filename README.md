@@ -2,7 +2,7 @@
 ## _Front-end by React and  Back-end by Nodejs with Express_
 ## _Database by Cloud Firestore of Firebase_
 ------
-### ** Basic functions:**
+### **Overview functions**
 -Login with phone number
 ![Login.](/screenshots/login.png)
 -Validate by OTP
