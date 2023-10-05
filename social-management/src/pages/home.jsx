@@ -76,8 +76,8 @@ export default function Home() {
     try {
       await getUser();
       await getFbPosts();
-      await getXPosts();
       await getFavoritePosts();
+      // await getXPosts();
     } catch (err) {
       console.log("error", err);
       // if (err.message) {
