@@ -1,5 +1,6 @@
 # Social Management
 ## _Front-end by React and  Back-end by Nodejs with Express_
+## _Database by Cloud Firestore of Firebase_
 ------
 ### ** Basic functions:**
 -Login with phone number
