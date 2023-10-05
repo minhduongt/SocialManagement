@@ -19,7 +19,7 @@
 ![Search posts.](/screenshots/search.png)
 -Logout
 
-## ** How to run::**
+## **How to run**
 ### _Require install Node version >= 14_
 ### _!! Need configuration file to start both project correctly_
 ### Front-end
