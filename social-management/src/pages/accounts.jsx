@@ -17,7 +17,8 @@ import userApi from "api/user";
 
 export default function Accounts() {
   const toast = useToast();
-  const [fbToken, SetFbToken] = useState("");
+  const [fbToken, setFbToken] = useState("");
+  const [xToken, setXToken] = useState("");
   const [user, setUser] = useState(null);
 
   const fetchApi = async () => {
@@ -30,8 +31,9 @@ export default function Accounts() {
   }, []);
   useEffect(() => {
     if (user) {
-      const { facebookAccessToken } = user;
-      SetFbToken(facebookAccessToken);
+      const { facebookAccessToken, twitterAccessToken } = user;
+      setFbToken(facebookAccessToken);
+      setXToken(twitterAccessToken);
     }
   }, [user]);
 
@@ -101,14 +103,69 @@ export default function Accounts() {
       }
     }
   };
+
   const loginWithInstagram = () => {
     console.log("Instagram");
-    // window.open("http://localhost:8000/api/v1/users/facebook", "_self");
   };
-  const loginWithX = () => {
-    console.log("X");
-    // window.open("http://localhost:8000/api/v1/users/facebook", "_self");
+
+  const loginWithX = async () => {
+    try {
+      const localPhone = localStorage.getItem("phoneNumber");
+      const res = await userApi.twitterLogin({ phoneNumber: localPhone });
+
+      if (res.success === true) {
+        fetchApi();
+        toast({
+          title: "Login in with twitter successfully!",
+          status: "success",
+          position: "top-right",
+          isClosable: true,
+          duration: 1000,
+        });
+      }
+    } catch (err) {
+      console.log("error", err);
+      if (err?.message) {
+        toast({
+          title: `Error: ${err?.message}`,
+          status: "error",
+          position: "top-right",
+          isClosable: true,
+          duration: 1000,
+        });
+      }
+    }
   };
+
+  const logoutWithX = async () => {
+    try {
+      const localPhone = localStorage.getItem("phoneNumber");
+      const res = await userApi.twitterLogout({ phoneNumber: localPhone });
+
+      if (res.success === true) {
+        fetchApi();
+        toast({
+          title: "Login out twitter successfully!",
+          status: "success",
+          position: "top-right",
+          isClosable: true,
+          duration: 1000,
+        });
+      }
+    } catch (err) {
+      console.log("error", err);
+      if (err?.message) {
+        toast({
+          title: `Error: ${err?.message}`,
+          status: "error",
+          position: "top-right",
+          isClosable: true,
+          duration: 1000,
+        });
+      }
+    }
+  };
+
   const socialMedias = [
     {
       title: "Facebook",
@@ -117,9 +174,9 @@ export default function Accounts() {
       button:
         fbToken === "" ? (
           <FacebookLogin
-            appId="276695108520546"
+            appId="335851842285898"
             fields="name,email,picture"
-            scope="user_hometown"
+            scope="pages_show_list"
             callback={loginWithFacebook}
             render={(renderProps) => (
               <Button
@@ -161,58 +218,64 @@ export default function Accounts() {
       description: "",
       icon: FiInstagram,
       button: (
-        <FacebookLogin
-          appId="276695108520546"
-          callback={loginWithFacebook}
-          render={(renderProps) => (
-            <Button
-              isDisabled={user != null ? false : true}
-              w={"full"}
-              mt={8}
-              bg={"#151f21"}
-              color={"white"}
-              rounded={"md"}
-              _hover={{
-                transform: "translateY(-2px)",
-                boxShadow: "lg",
-              }}
-              onClick={renderProps.onClick}
-            >
-              {user != null ? "Sign in" : "Loading..."}
-            </Button>
-          )}
-        />
+        <Button
+          isDisabled={user != null ? false : true}
+          w={"full"}
+          mt={8}
+          bg={"#151f21"}
+          color={"white"}
+          rounded={"md"}
+          _hover={{
+            transform: "translateY(-2px)",
+            boxShadow: "lg",
+          }}
+          onClick={() => {}}
+        >
+          {user != null ? "Sign in" : "Loading..."}
+        </Button>
       ),
     },
     {
-      title: "X",
+      title: "X (Twitter)",
       description: "",
       icon: FiX,
-      button: (
-        <FacebookLogin
-          appId="276695108520546"
-          callback={loginWithFacebook}
-          render={(renderProps) => (
-            <Button
-              isDisabled={user != null ? false : true}
-              w={"full"}
-              mt={8}
-              bg={"#151f21"}
-              color={"white"}
-              rounded={"md"}
-              _hover={{
-                transform: "translateY(-2px)",
-                boxShadow: "lg",
-              }}
-              onClick={renderProps.onClick}
-            >
-              {user != null ? "Sign in" : "Loading..."}
-            </Button>
-          )}
-        />
-      ),
+      button:
+        xToken === "" ? (
+          <Button
+            isDisabled={user != null ? false : true}
+            w={"full"}
+            mt={8}
+            bg={"#151f21"}
+            color={"white"}
+            rounded={"md"}
+            _hover={{
+              transform: "translateY(-2px)",
+              boxShadow: "lg",
+            }}
+            onClick={loginWithX}
+          >
+            {user != null ? "Sign in" : "Loading..."}
+          </Button>
+        ) : (
+          <Button
+            isDisabled={user != null ? false : true}
+            w={"full"}
+            mt={8}
+            bg={"#151f21"}
+            color={"white"}
+            rounded={"md"}
+            _hover={{
+              transform: "translateY(-2px)",
+              boxShadow: "lg",
+            }}
+            onClick={logoutWithX}
+          >
+            {user != null ? "Sign out" : "Loading..."}
+          </Button>
+        ),
     },
   ];
+
   return (
     <Box ml={{ base: 0, md: 60 }}>
       <Box bg={"white"} mb={12}>
@@ -222,7 +285,11 @@ export default function Accounts() {
           justifyContent={"space-between"}
           px={8}
         >
-          <Box>Accounts</Box>
+          <Box>
+            <Text fontSize={24} fontWeight={"semibold"}>
+              Accounts{}
+            </Text>
+          </Box>
         </Flex>
       </Box>
       {/* Content */}

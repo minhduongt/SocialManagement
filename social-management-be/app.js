@@ -1,3 +1,4 @@
+require("dotenv").config();
 const errorMiddleware = require("./middlewares/error");
 const express = require("express");
 const path = require("path");

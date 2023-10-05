@@ -23,6 +23,17 @@ const initApiRoute = (app) => {
     "/users/getFavoritePosts/:phoneNumber",
     userController.getFavoritePosts
   );
+  router.post("/users/loginTwitter", userController.loginTwitter);
+  router.post("/users/signOutTwitter", userController.signOutTwitter);
+  router.post("/users/createPostTwitter", userController.createPostTwitter);
+  router.post(
+    "/users/createScheduledPostTwitter",
+    userController.createScheduledPostTwitter
+  );
+  router.get(
+    "/users/getPostTwitter/:phoneNumber",
+    userController.getPostTwitter
+  );
 
   return app.use("/api/v1", router);
 };

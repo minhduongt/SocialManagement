@@ -13,6 +13,7 @@ import {
   DrawerContent,
   useDisclosure,
   useToast,
+  Stack,
 } from "@chakra-ui/react";
 import { FiHome, FiLogOut, FiUser, FiMenu } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -96,14 +97,16 @@ const SidebarContent = ({ onClose, ...rest }) => {
         </Text>
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
-      {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon} path={link.path}>
-          {link.name}
+      <Stack gap={2}>
+        {LinkItems.map((link) => (
+          <NavItem key={link.name} icon={link.icon} path={link.path}>
+            {link.name}
+          </NavItem>
+        ))}
+        <NavItem icon={FiLogOut} onClick={signOut}>
+          {"Sign Out"}
         </NavItem>
-      ))}
-      <NavItem icon={FiLogOut} onClick={signOut}>
-        {"Sign Out"}
-      </NavItem>
+      </Stack>
     </Box>
   );
 };

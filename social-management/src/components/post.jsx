@@ -69,7 +69,7 @@ export default function Post({ post, isLiked, onHandleLikePost, ...rest }) {
         {/* <Heading color={"black"} fontSize={"2xl"} noOfLines={1}>
          Title
           </Heading> */}
-        <Text color={"gray.500"} noOfLines={2}>
+        <Text color={"black"} noOfLines={2}>
           {message}
         </Text>
       </Box>

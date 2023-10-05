@@ -98,7 +98,7 @@ function Authenticate() {
 
   return (
     <Flex minH={"100vh"} align={"center"} justify={"center"} bg={"gray.50"}>
-      <Stack spacing={8} mx={"auto"} maxW={"2xl"} py={12} px={6}>
+      <Stack spacing={8} mx={"auto"} maxW={"3xl"} py={12} px={6}>
         <Stack align={"center"}>
           <Heading fontSize={"4xl"}>Welcome to Social Management ✌️</Heading>
           <Flex flexDirection={"row"}>
@@ -108,7 +108,7 @@ function Authenticate() {
             </Text> */}
           </Flex>
         </Stack>
-        <Box rounded={"lg"} bg={"white"} boxShadow={"lg"} p={8}>
+        <Box rounded={"lg"} bg={"white"} boxShadow={"lg"} p={4}>
           <Stack spacing={4}>
             <FormProvider {...authenForm}>
               <FormControl>
@@ -117,7 +117,7 @@ function Authenticate() {
                     <FormLabel>Phone number</FormLabel>
                     <Input
                       sx={{ mt: 4 }}
-                      placeholder="Ex: 84939456738"
+                      placeholder="Ex: 84123456789 (Your country code + phone number with no spacing)"
                       {...register("phoneNumber")}
                     />
 

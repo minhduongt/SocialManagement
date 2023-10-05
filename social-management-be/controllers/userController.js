@@ -1,4 +1,6 @@
 const userService = require("../services/userServices");
+const facebookServices = require("../services/facebookServices");
+const twitterServices = require("../services/twitterServices");
 const smsService = require("../services/smsServices");
 
 const getUserList = async (req, res) => {
@@ -85,7 +87,7 @@ const loginFacebook = async (req, res) => {
     const requestBody = req.body;
     const { accessToken } = requestBody;
     if (accessToken) {
-      await userService.loginFacebook(requestBody);
+      await facebookServices.loginFacebook(requestBody);
       res.status(200).json({
         success: true,
       });
@@ -103,7 +105,39 @@ const loginFacebook = async (req, res) => {
 const signOutFacebook = async (req, res) => {
   try {
     const requestBody = req.body;
-    await userService.logoutFacebook(requestBody);
+    await facebookServices.logoutFacebook(requestBody);
+    res.status(200).json({
+      success: true,
+    });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+const loginTwitter = async (req, res) => {
+  try {
+    const requestBody = req.body;
+    const { phoneNumber } = requestBody;
+    if (phoneNumber) {
+      await twitterServices.loginTwitter(requestBody);
+      res.status(200).json({
+        success: true,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "Login with twitter failed!",
+      });
+    }
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+const signOutTwitter = async (req, res) => {
+  try {
+    const requestBody = req.body;
+    await twitterServices.logoutTwitter(requestBody);
     res.status(200).json({
       success: true,
     });
@@ -118,14 +152,14 @@ const createPostFacebook = async (req, res) => {
     const user = await userService.getUserByPhone(phoneNumber);
 
     if (user) {
-      const page = await userService.getFacebookPage(
+      const page = await facebookServices.getFacebookPage(
         user.facebookUserId,
         user.facebookAccessToken
       );
-
+      console.log("page", page);
       if (page) {
         const { access_token: pageAccessToken, id: pageId } = page.data[0];
-        const response = await userService.createPostFacebook(
+        const response = await facebookServices.createPostFacebook(
           pageId,
           message,
           pageAccessToken
@@ -155,13 +189,13 @@ const createScheduledPostFacebook = async (req, res) => {
     const user = await userService.getUserByPhone(phoneNumber);
 
     if (user) {
-      const page = await userService.getFacebookPage(
+      const page = await facebookServices.getFacebookPage(
         user.facebookUserId,
         user.facebookAccessToken
       );
       if (page) {
         const { access_token: pageAccessToken, id: pageId } = page.data[0];
-        const response = await userService.createScheduledPostFacebook(
+        const response = await facebookServices.createScheduledPostFacebook(
           pageId,
           message,
           pageAccessToken,
@@ -185,20 +219,54 @@ const createScheduledPostFacebook = async (req, res) => {
   }
 };
 
+const createPostTwitter = async (req, res) => {
+  try {
+    const { phoneNumber, message } = req.body;
+    const user = await userService.getUserByPhone(phoneNumber);
+    const {
+      twitterApiKey,
+      twitterAccessToken,
+      twitterApiSecret,
+      twitterAccessSecret,
+    } = user;
+    const response = await twitterServices.createPostTwitter(
+      twitterApiKey,
+      twitterApiSecret,
+      twitterAccessToken,
+      twitterAccessSecret,
+      message
+    );
+    if (response?.data) {
+      console.log("create tweet", response.data);
+      res.status(200).json({ success: true });
+    }
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+const createScheduledPostTwitter = async (req, res) => {
+  try {
+    const { phoneNumber, message, scheduledTime } = req.body;
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
 const getPostFacebook = async (req, res) => {
   try {
     const phoneNumber = req.params["phoneNumber"];
     const user = await userService.getUserByPhone(phoneNumber);
 
     if (user) {
-      const page = await userService.getFacebookPage(
+      const page = await facebookServices.getFacebookPage(
         user.facebookUserId,
         user.facebookAccessToken
       );
       if (page) {
         const { access_token: pageAccessToken, id: pageId } = page.data[0];
 
-        const response = await userService.getFacebookPagePosts(
+        const response = await facebookServices.getFacebookPagePosts(
           pageId,
           pageAccessToken
         );
@@ -214,6 +282,32 @@ const getPostFacebook = async (req, res) => {
           });
         }
       }
+    }
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+const getPostTwitter = async (req, res) => {
+  try {
+    const phoneNumber = req.params["phoneNumber"];
+    const user = await userService.getUserByPhone(phoneNumber);
+    const {
+      twitterApiKey,
+      twitterAccessToken,
+      twitterApiSecret,
+      twitterAccessSecret,
+    } = user;
+
+    const response = await twitterServices.getPostTwitter(
+      twitterApiKey,
+      twitterApiSecret,
+      twitterAccessToken,
+      twitterAccessSecret
+    );
+    console.log("post twitter ", response);
+    if (response?.data) {
+      res.status(200).json({ success: true });
     }
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -256,4 +350,9 @@ module.exports = {
   getPostFacebook,
   likeSocialPost,
   getFavoritePosts,
+  loginTwitter,
+  signOutTwitter,
+  createPostTwitter,
+  createScheduledPostTwitter,
+  getPostTwitter,
 };
