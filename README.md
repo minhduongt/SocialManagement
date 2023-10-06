@@ -25,6 +25,8 @@ Clone the project.
 
 > _!! Need configuration file to start both project correctly (Contact me)_
 
+> If you do not receive your OTP, you can enter 112233 alternatively.
+
 ### Front-end
 ```
 cd social-management
