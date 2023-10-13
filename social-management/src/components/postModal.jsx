@@ -97,7 +97,7 @@ function PostModal({
                       placeholder="Select Date and Time"
                       size="md"
                       type="datetime-local"
-                      {...register("fbScheduledTime")}
+                      {...register("scheduledTime")}
                     />
                   )}
                 </Flex>

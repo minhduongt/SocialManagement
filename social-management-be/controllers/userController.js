@@ -164,7 +164,7 @@ const createPostFacebook = async (req, res) => {
           message,
           pageAccessToken
         );
-
+        console.log("response", response);
         if (response.id) {
           res.status(200).json({
             success: true,
@@ -201,7 +201,7 @@ const createScheduledPostFacebook = async (req, res) => {
           pageAccessToken,
           scheduledTime
         );
-
+        console.log("response", response);
         if (response.id) {
           res.status(200).json({
             success: true,
@@ -209,7 +209,7 @@ const createScheduledPostFacebook = async (req, res) => {
         } else {
           res.status(400).json({
             success: false,
-            message: "Create facebook post failed!",
+            message: "Create scheduled facebook post failed!",
           });
         }
       }

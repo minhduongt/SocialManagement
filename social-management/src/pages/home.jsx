@@ -12,6 +12,8 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  Skeleton,
+  Stack,
   Text,
   useDisclosure,
   useToast,
@@ -38,6 +40,8 @@ export default function Home() {
   const [favoritePosts, setFavoritePosts] = useState(null);
   const [user, setUser] = useState(null);
   const [search, setSearch] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [loading, setLoading] = useState(false);
   const postForm = useForm({
     resolver: yupResolver(formSchema),
   });
@@ -74,9 +78,11 @@ export default function Home() {
 
   const fetchApi = async () => {
     try {
+      setLoading(true);
       await getUser();
       await getFbPosts();
       await getFavoritePosts();
+      setLoading(false);
       // await getXPosts();
     } catch (err) {
       console.log("error", err);
@@ -97,6 +103,12 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (search !== "") {
+      setIsSearching(true);
+    } else {
+      setIsSearching(false);
+    }
+
     const delayDebounceFn = setTimeout(() => {
       searchPost();
     }, 2000);
@@ -269,7 +281,7 @@ export default function Home() {
 
   const onSubmit = async (form) => {
     try {
-      console.log("form", form);
+      // console.log("form", form);
       const {
         isScheduled,
         postContent,
@@ -331,6 +343,7 @@ export default function Home() {
       });
 
       setFilteredPosts(newFilteredPosts);
+      setIsSearching(false);
     }
   };
 
@@ -382,7 +395,7 @@ export default function Home() {
         </FormProvider>
       </Box>
       {/* Content */}
-      {posts && (
+      {posts && !loading && (
         <Flex pb={6} justifyContent={"center"}>
           <InputGroup sx={{ width: "40%" }}>
             <InputLeftElement pointerEvents="none">
@@ -397,7 +410,37 @@ export default function Home() {
           </InputGroup>
         </Flex>
       )}
-
+      {(isSearching || loading) && user?.facebookAccessToken !== "" && (
+        <Stack gap={10} px={20}>
+          <Grid
+            templateColumns={{
+              xs: "repeat(1, 1fr)",
+              md: "repeat(2, 1fr)",
+              lg: "repeat(3, 1fr)",
+            }}
+            gap={2}
+          >
+            <GridItem>
+              <Stack>
+                <Skeleton height="90px" />
+                <Skeleton height="40px" />
+              </Stack>
+            </GridItem>
+            <GridItem>
+              <Stack>
+                <Skeleton height="90px" />
+                <Skeleton height="40px" />
+              </Stack>
+            </GridItem>
+            <GridItem>
+              <Stack>
+                <Skeleton height="90px" />
+                <Skeleton height="40px" />
+              </Stack>
+            </GridItem>
+          </Grid>
+        </Stack>
+      )}
       <Grid
         templateColumns={{
           xs: "repeat(1, 1fr)",
@@ -410,7 +453,7 @@ export default function Home() {
           <Flex justifyContent={"center"}>
             <Text>Connect to your social account to view posts.</Text>
           </Flex>
-        ) : search !== "" ? (
+        ) : search !== "" && !isSearching ? (
           filteredPosts && filteredPosts.length > 0 ? (
             filteredPosts?.map((post) => {
               const isLiked = favoritePosts?.find((e) => e === post.id) != null;
@@ -430,7 +473,7 @@ export default function Home() {
               <Text>Not found.</Text>
             </Flex>
           )
-        ) : posts ? (
+        ) : posts && posts.length > 0 && !isSearching ? (
           posts?.map((post) => {
             const isLiked = favoritePosts?.find((e) => e === post.id) != null;
 
@@ -445,9 +488,12 @@ export default function Home() {
             );
           })
         ) : (
-          <Flex justifyContent={"center"}>
-            <Text>There is no post right now.</Text>
-          </Flex>
+          !isSearching &&
+          !loading && (
+            <Flex justifyContent={"center"}>
+              <Text>There is no post right now.</Text>
+            </Flex>
+          )
         )}
       </Grid>
     </Box>
